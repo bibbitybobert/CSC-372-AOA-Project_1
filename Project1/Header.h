@@ -66,5 +66,7 @@ void stations::fillTransAry(ifstream& fin) {
 
 ifstream open_file(string fin_name);
 
+void outputData();
+
 void findPath(stations& map);
 
