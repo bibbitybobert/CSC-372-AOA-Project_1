@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 	layout.create(in_file);
 	in_file.close();
 
-	findPath(layout.stations - 1, 0, layout);
+	layout.fastestTime = findFastest(layout.stations - 1, 0, layout);
 
 	outputData(layout);
 
@@ -42,14 +42,33 @@ ifstream open_file(string fin_name) {
 	return fin;
 }
 
-void findPath(int stage, int route, stations& map) {
-	if (stage == 0) {
-		map.lookup[0][0] = map.stationWeights[route][0];
-	}
-	else {
-		vector<int> transfer;
+int findFastest(int stage, int route, stations& map) {
+	if (stage == 0)
+		return map.stationWeights[route][0];
 
+	for (int i = 0; i < map.lines; i++) {
+		int sum_total = 0;
+
+		if (map.lookup[stage - 1][1] != -1)
+			sum_total += map.lookup[stage - 1][0];
+		else
+			sum_total = findFastest(stage - 1, i, map);
+
+
+		//stay on same line
+		if (i != route) {
+			sum_total += map.transferWeight[stage - 1][i][route];
+		}
+
+		sum_total = sum_total + map.stationWeights[route][stage]
+			+ map.transferWeight[stage][route - 1][route - 1];
+
+		if (sum_total < map.lookup[stage][0]) {
+			map.lookup[stage][0] = sum_total;
+			map.lookup[stage][1] = i;
+		}
 	}
+	return map.lookup[stage][0];
 }
 
 void outputData(stations& data) {

@@ -18,7 +18,7 @@ public:
 	vector<vector<int>> lookup;
 	int stations;
 	int lines;
-	int fastestTime = INTMAX_MAX;
+	int fastestTime = INT_MAX;
 	void create(ifstream& inputFile);
 private:
 	void fillTransAry(ifstream& fin);
@@ -26,7 +26,7 @@ private:
 };
 
 void stations::create(ifstream& fin) {
-	vector<int> temp = { 0, -1 };
+	vector<int> temp = { INT_MAX, -1 };
 	fin >> this->lines >> this->stations;
 
 	//fill stations array
@@ -70,7 +70,7 @@ void stations::fillTransAry(ifstream& fin) {
 
 ifstream open_file(string fin_name);
 
-void outputData();
+void outputData(stations& map);
 
-void findPath(stations& map);
+int findFastest(int stage, int route, stations& map);
 
