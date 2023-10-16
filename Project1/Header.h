@@ -8,8 +8,13 @@ using namespace std;
 
 class stations {
 public:
+	//formatted as stationWeights[route][station]
 	vector<vector<int>> stationWeights;
+
+	//formatted as transferWeight[station][from][to]
 	vector<vector<vector<int>>> transferWeight;
+
+	//formatted as lookup[stage] = (time, line)
 	vector<vector<int>> lookup;
 	int stations;
 	int lines;
@@ -21,6 +26,7 @@ private:
 };
 
 void stations::create(ifstream& fin) {
+	vector<int> temp = { 0, -1 };
 	fin >> this->lines >> this->stations;
 
 	//fill stations array
@@ -29,10 +35,8 @@ void stations::create(ifstream& fin) {
 	//fill transfer array
 	fillTransAry(fin);
 
-	//fill lookup array
-	lookup.resize(this->stations);
 	for (int i = 0; i < this->stations; i++) {
-		lookup[i].resize(2);
+		lookup.push_back(temp);
 	}
 }
 

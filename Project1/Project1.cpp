@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
 	layout.create(in_file);
 	in_file.close();
 
-	findPath(layout);
+	findPath(layout.stations - 1, 0, layout);
 
-	outputData();
+	outputData(layout);
 
 	return(0);
 }
@@ -42,10 +42,21 @@ ifstream open_file(string fin_name) {
 	return fin;
 }
 
-void findPath(stations& map) {
+void findPath(int stage, int route, stations& map) {
+	if (stage == 0) {
+		map.lookup[0][0] = map.stationWeights[route][0];
+	}
+	else {
+		vector<int> transfer;
 
+	}
 }
 
-void outputData() {
-
+void outputData(stations& data) {
+	cout << "Total time: " << data.fastestTime << endl;
+	cout << "Line Progress: \n";
+	for (int i = 0; i < data.lookup.size(); i++) {
+		cout << data.lookup[i][0] << "(" << data.lookup[i][1] << ")\n";
+	}
+	cout << data.fastestTime << '(' << data.lookup[data.stations - 1][1] << ')\n';
 }
