@@ -114,3 +114,19 @@ def testingIncRoutes(numTestCases, stages, maxRoutes = 20):
         print('ran ' + str(numTestCases) + ' Test cases at ' + str(stages) + 'x' + str(i))
 
     return runTimes
+
+def testingIncBoth(numTestCases, maxBoth):
+    runTimes = []
+    for i in range(1, maxBoth + 1):
+        testTimes = []
+        for j in range(0, numTestCases):
+            makeTestFile(i, i)
+            start = time.time()
+            os.system('C:\dev\gitlab\csc372\Project1\Project1\Project1\Project1 NewTestFile.txt -t')
+            end = time.time()
+            diff = end - start
+            testTimes.append(diff)
+        runTimes.append(stats.mean(testTimes))
+        print('ran ' + str(numTestCases) + ' Test cases at ' + str(i) + 'x' + str(i))
+
+    return runTimes
