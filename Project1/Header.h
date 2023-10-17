@@ -14,19 +14,23 @@ public:
 	//formatted as transferWeight[station][from][to]
 	vector<vector<vector<int>>> transferWeight;
 
-	//formatted as lookup[stage] = (time, line)
-	vector<vector<int>> lookup;
+	//formatted as lookup[station][route][from]
+	vector<vector<vector<int>>> lookup;
+
+	vector<vector<int>> pathing;
+
 	int stations;
 	int lines;
 	int fastestTime = INT_MAX;
+	int best_end = -1;
 	void create(ifstream& inputFile);
+	void createLookup();
 private:
 	void fillTransAry(ifstream& fin);
 	void fillStatAry(ifstream& fin);
 };
 
 void stations::create(ifstream& fin) {
-	vector<int> temp = { INT_MAX, -1 };
 	fin >> this->lines >> this->stations;
 
 	//fill stations array
@@ -35,9 +39,7 @@ void stations::create(ifstream& fin) {
 	//fill transfer array
 	fillTransAry(fin);
 
-	for (int i = 0; i < this->stations; i++) {
-		lookup.push_back(temp);
-	}
+	createLookup();
 }
 
 void stations::fillStatAry(ifstream& fin) {
@@ -65,6 +67,17 @@ void stations::fillTransAry(ifstream& fin) {
 			station_transfer.push_back(single_transfer);
 		}
 		this->transferWeight.push_back(station_transfer);
+	}
+}
+
+void stations::createLookup() {
+	int new_data;
+	for (int i = 0; i <= this->stations; i++) {
+		vector<vector<int>> temp;
+		for (int j = 0; j < this->lines; j++) {
+			temp.push_back({ INT_MAX, -1 });
+		}
+		this->lookup.push_back(temp);
 	}
 }
 

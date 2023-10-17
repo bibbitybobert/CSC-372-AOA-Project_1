@@ -5,6 +5,7 @@ using namespace std;
 int main(int argc, char** argv) {
 	ifstream in_file;
 	stations layout;
+	bool testing = false;
 
 	switch (argc) {
 	case 0: //HOW????
@@ -14,6 +15,11 @@ int main(int argc, char** argv) {
 		cout << "Please run with a file for data input\n";
 		exit(0);
 	case 2: //only input file given
+		break;
+	case 3:
+		if (argv[2][0] == '-' && argv[2][1] == 't') {
+			testing = true;
+		}
 		break;
 	default:
 		cout << "Too many command line arguments\n Please input only one input file name\n";
@@ -25,9 +31,17 @@ int main(int argc, char** argv) {
 	layout.create(in_file);
 	in_file.close();
 
-	layout.fastestTime = findFastest(layout.stations - 1, 0, layout);
+	for (int i = 0; i < layout.lines; i++) {
+		int temp = findFastest(layout.stations, i, layout);
+		if (temp < layout.fastestTime) {
+			layout.fastestTime = temp;
+			layout.best_end = i;
+		}
+	}
 
-	outputData(layout);
+	if (!testing) {
+		outputData(layout);
+	}
 
 	return(0);
 }
@@ -43,39 +57,69 @@ ifstream open_file(string fin_name) {
 }
 
 int findFastest(int stage, int route, stations& map) {
-	if (stage == 0)
+	if (stage == 0) {
+		//GRADING:UPDATE
+		map.lookup[stage][route][0] = map.stationWeights[route][0];
+		map.lookup[stage][route][1] = -1;
 		return map.stationWeights[route][0];
-
+	}
+	int return_data = INT_MAX;
+	int best_line = -1;
 	for (int i = 0; i < map.lines; i++) {
 		int sum_total = 0;
 
-		if (map.lookup[stage - 1][1] != -1)
-			sum_total += map.lookup[stage - 1][0];
-		else
+
+		if (map.lookup[stage - 1][i][0] == INT_MAX) {
 			sum_total = findFastest(stage - 1, i, map);
+		}
+		else {
+			//GRADING:REUSE
+			sum_total = map.lookup[stage-1][i][0]; 
+		}
+				
 
-
-		//stay on same line
+		//change lines
 		if (i != route) {
 			sum_total += map.transferWeight[stage - 1][i][route];
 		}
 
-		sum_total = sum_total + map.stationWeights[route][stage]
-			+ map.transferWeight[stage][route - 1][route - 1];
-
-		if (sum_total < map.lookup[stage][0]) {
-			map.lookup[stage][0] = sum_total;
-			map.lookup[stage][1] = i;
+		if (stage != map.stations) {
+			sum_total += map.stationWeights[route][stage]
+				+ map.transferWeight[stage - 1][route][route];
 		}
+		else {
+			sum_total += map.transferWeight[stage -1][route][route];
+		}
+
+		if (sum_total < return_data) {
+			return_data = sum_total;
+			best_line = i;
+		}
+
 	}
-	return map.lookup[stage][0];
+	if (return_data < map.lookup[stage][route][0]) {
+		//GRADING:UPDATE
+		map.lookup[stage][route][0] = return_data;
+		map.lookup[stage][route][1] = best_line;
+	}
+	return return_data;
 }
 
 void outputData(stations& data) {
 	cout << "Total time: " << data.fastestTime << endl;
-	cout << "Line Progress: \n";
-	for (int i = 0; i < data.lookup.size(); i++) {
-		cout << data.lookup[i][0] << "(" << data.lookup[i][1] << ")\n";
+	cout << "Line Progress:\n";
+	
+	int curr_stage = data.stations - 1;
+	int next = data.lookup[curr_stage +1][data.best_end][1];
+	vector<vector<int>> pathing;
+	while (next != -1) {
+		vector<int> temp = { data.lookup[curr_stage][next][0], next };
+		pathing.push_back(temp);
+		next = data.lookup[curr_stage][next][1];
+		curr_stage--;
 	}
-	cout << data.fastestTime << '(' << data.lookup[data.stations - 1][1] << ')\n';
+	for (int i = pathing.size() - 1; i >= 0; i--) {
+		cout << pathing[i][0] << '(' << pathing[i][1] << ")\n";
+	}
+	cout << data.fastestTime << '(' << data.best_end << ")\n";
 }
