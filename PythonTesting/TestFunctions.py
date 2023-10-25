@@ -130,3 +130,4 @@ def testingIncBoth(numTestCases, maxBoth):
         print('ran ' + str(numTestCases) + ' Test cases at ' + str(i) + 'x' + str(i))
 
     return runTimes
+
